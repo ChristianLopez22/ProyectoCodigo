@@ -19,7 +19,7 @@ public class Main {
             Inventarios.verDisponibilidad(inventarios);
         }
 
-        // Registrar un nuevo préstamo
+        ////Registrar un nuevo préstamo
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la fecha del préstamo (formato: YYYYMMDD):");
         int fecha = scanner.nextInt();
@@ -28,14 +28,16 @@ public class Main {
         System.out.println("Ingrese el nombre del usuario:");
         String usuario = scanner.nextLine();
 
+
+        
         System.out.println("Ingrese el nombre del producto prestado:");
         String producto = scanner.nextLine();
 
-        // Crear el nuevo préstamo y registrarlo
+        ////Crear el nuevo préstamo y registrarlo
         Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto);
         nuevoPrestamo.registrarPrestamo(archivoPrestamos);
 
-        // Guardar inventarios en el archivo CSV
+        ////Guardar inventarios en el archivo CSV
         System.out.println("Guardando inventarios en el archivo CSV...");
         Inventarios.escribirInventarioEnCSV(archivoInventario, inventarios);
 

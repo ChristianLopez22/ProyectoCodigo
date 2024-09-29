@@ -13,14 +13,14 @@ public class Prestado {
     private String usuario;
     private String producto;
 
-    // Constructor
+    //////Constructor
     public Prestado(int fecha, String usuario, String producto) {
         this.fecha = fecha;
         this.usuario = usuario;
         this.producto = producto;
     }
 
-    // Getters y setters
+    //////Getters y setters
     public int getFecha() {
         return fecha;
     }
@@ -45,7 +45,7 @@ public class Prestado {
         this.producto = producto;
     }
 
-    // Método para cargar los préstamos desde un archivo CSV
+    //////Método para cargar los préstamos desde un archivo CSV
     public static List<Prestado> cargarPrestamosDesdeCSV(String archivo) {
         List<Prestado> prestamos = new ArrayList<>();
         File file = new File(archivo);
@@ -66,7 +66,7 @@ public class Prestado {
         return prestamos;
     }
 
-    // Método para escribir los préstamos en un archivo CSV
+    //////Método para escribir los préstamos en un archivo CSV
     public static void escribirPrestamosEnCSV(String archivo, List<Prestado> prestamos) {
         try (CSVWriter writer = new CSVWriter(new FileWriter(archivo))) {
             for (Prestado prestamo : prestamos) {
@@ -82,7 +82,7 @@ public class Prestado {
         }
     }
 
-    // Método para registrar un nuevo préstamo
+    /////Método para registrar un nuevo préstamo
     public void registrarPrestamo(String archivo) {
 
         try (CSVWriter writer = new CSVWriter(new FileWriter(archivo, true))) {
