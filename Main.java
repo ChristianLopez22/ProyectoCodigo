@@ -11,7 +11,7 @@ public class Main {
         System.out.println("Cargando inventarios desde el archivo CSV...");
         List<Inventarios> inventarios = Inventarios.cargarInventarioDesdeCSV(archivoInventario);
 
-        // Si el inventario está vacío, indicamos que no hay materiales cargados
+        // Si el inventario está vacío indicamos que no hay materiales cargados
         if (inventarios.isEmpty()) {
             System.out.println("No hay inventarios cargados.");
         } else {
@@ -23,7 +23,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese la fecha del préstamo (formato: YYYYMMDD):");
         int fecha = scanner.nextInt();
-        scanner.nextLine();  // Consumir la nueva línea después de nextInt()
+        scanner.nextLine(); 
 
         System.out.println("Ingrese el nombre del usuario:");
         String usuario = scanner.nextLine();
@@ -35,7 +35,7 @@ public class Main {
         Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto);
         nuevoPrestamo.registrarPrestamo(archivoPrestamos);
 
-        // Guardar inventarios en el archivo CSV (para probar la escritura)
+        // Guardar inventarios en el archivo CSV
         System.out.println("Guardando inventarios en el archivo CSV...");
         Inventarios.escribirInventarioEnCSV(archivoInventario, inventarios);
 
