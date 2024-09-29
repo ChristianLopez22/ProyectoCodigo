@@ -1,6 +1,6 @@
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
+import com.opencsv.exceptions.CsvValidationException;  
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -41,7 +41,7 @@ public class Inventarios {
         File file = new File(archivo);
         if (!file.exists()) {
             System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
-            return inventarios;
+            return inventarios; 
         }
 
         try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
@@ -50,8 +50,8 @@ public class Inventarios {
                 Inventarios inventario = new Inventarios(Integer.parseInt(linea[0]), linea[1]);
                 inventarios.add(inventario);
             }
-        } catch (IOException | CsvValidationException e) {
-            e.printStackTrace();
+        } catch (IOException | CsvValidationException e) {  
+            e.printStackTrace(); 
         }
         return inventarios;
     }
@@ -72,7 +72,6 @@ public class Inventarios {
     }
 
     // Método para verificar la disponibilidad de materiales
-    
     public static void verDisponibilidad(List<Inventarios> inventarios) {
         System.out.println("Verificando disponibilidad de materiales...");
         for (Inventarios inventario : inventarios) {
