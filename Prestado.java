@@ -1,6 +1,6 @@
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;  // Importar la excepción CsvValidationException
+import com.opencsv.exceptions.CsvValidationException;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -13,36 +13,45 @@ public class Prestado {
     private String usuario;
     private String producto;
 
+    // Constructor
     public Prestado(int fecha, String usuario, String producto) {
         this.fecha = fecha;
         this.usuario = usuario;
         this.producto = producto;
     }
+
+    // Getters y setters
     public int getFecha() {
         return fecha;
     }
+
     public void setFecha(int fecha) {
         this.fecha = fecha;
     }
+
     public String getUsuario() {
         return usuario;
     }
+
     public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
+
     public String getProducto() {
         return producto;
     }
+
     public void setProducto(String producto) {
         this.producto = producto;
     }
+
     // Método para cargar los préstamos desde un archivo CSV
     public static List<Prestado> cargarPrestamosDesdeCSV(String archivo) {
         List<Prestado> prestamos = new ArrayList<>();
         File file = new File(archivo);
         if (!file.exists()) {
             System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
-            return prestamos; 
+            return prestamos;
         }
 
         try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
@@ -52,10 +61,11 @@ public class Prestado {
                 prestamos.add(prestamo);
             }
         } catch (IOException | CsvValidationException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
         }
         return prestamos;
     }
+
     // Método para escribir los préstamos en un archivo CSV
     public static void escribirPrestamosEnCSV(String archivo, List<Prestado> prestamos) {
         try (CSVWriter writer = new CSVWriter(new FileWriter(archivo))) {
@@ -68,7 +78,23 @@ public class Prestado {
                 writer.writeNext(datos);
             }
         } catch (IOException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
+        }
+    }
+
+    // Método para registrar un nuevo préstamo
+    public void registrarPrestamo(String archivo) {
+
+        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo, true))) {
+            String[] datos = {
+                    String.valueOf(this.fecha),
+                    this.usuario,
+                    this.producto
+            };
+            writer.writeNext(datos);
+            System.out.println("Préstamo registrado exitosamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
