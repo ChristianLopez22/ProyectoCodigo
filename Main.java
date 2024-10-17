@@ -19,6 +19,7 @@ public class Main {
             System.out.println("2. Registrar un nuevo préstamo");
             System.out.println("3. Registrar un nuevo usuario");
             System.out.println("4. Modificar usuario existente");
+            System.out.println("5. Eliminar un usuario existente");
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
             opcion = scanner.nextInt();
@@ -90,17 +91,36 @@ public class Main {
                         }
                     }
 
-    System.out.print("Ingrese el nuevo nombre del usuario: ");
-    String nuevoNombre = scanner.nextLine();
+                    System.out.print("Ingrese el nuevo nombre del usuario: ");
+                    String nuevoNombre = scanner.nextLine();
 
-    System.out.print("Ingrese el nuevo correo electrónico del usuario: ");
-    String nuevoCorreo = scanner.nextLine();
+                    System.out.print("Ingrese el nuevo correo electrónico del usuario: ");
+                    String nuevoCorreo = scanner.nextLine();
 
-    System.out.print("Ingrese la nueva contraseña del usuario: ");
-    String nuevaContrasena = scanner.nextLine();
+                    System.out.print("Ingrese la nueva contraseña del usuario: ");
+                    String nuevaContrasena = scanner.nextLine();
 
-    Usuario.modificarUsuario(archivoUsuarios, carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
-    break;
+                    Usuario.modificarUsuario(archivoUsuarios, carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
+                    break;
+                case 5:
+                    // Eliminar un usuario existente
+                    System.out.println("\n--- Eliminar un Usuario ---");
+                    int carneEliminar = -1;
+                    boolean entradaEliminarValida = false;
+
+                    while (!entradaEliminarValida) {
+                        try {
+                            System.out.print("Ingrese el carnet del usuario que desea eliminar: ");
+                            String input = scanner.nextLine();
+                            carneEliminar = Integer.parseInt(input);
+                            entradaEliminarValida = true;  // Si el parse es exitoso, la entrada es válida
+                        } catch (NumberFormatException e) {
+                            System.out.println("Entrada no válida. Por favor ingrese un número entero para el carnet.");
+                        }
+                    }
+
+                    Usuario.eliminarUsuario(archivoUsuarios, carneEliminar);
+                    break;
 
 
                 case 0:

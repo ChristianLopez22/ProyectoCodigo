@@ -130,10 +130,13 @@ public class Usuario {
     // Método para eliminar un usuario del archivo CSV
     public static void eliminarUsuario(String archivo, int carneBuscado) {
         List<Usuario> usuarios = cargarUsuariosDesdeCSV(archivo);
-        usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
-        escribirUsuariosEnCSV(archivo, usuarios);
-        System.out.println("Usuario eliminado exitosamente.");
+        boolean usuarioEncontrado = usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
+
+        if (usuarioEncontrado) {
+            escribirUsuariosEnCSV(archivo, usuarios);
+            System.out.println("Usuario eliminado exitosamente.");
+        } else {
+            System.out.println("Usuario con carnet " + carneBuscado + " no encontrado.");
+        }
     }
 }
-
-
