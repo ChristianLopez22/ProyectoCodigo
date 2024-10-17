@@ -18,7 +18,7 @@ public class Main {
             System.out.println("1. Ver disponibilidad de materiales");
             System.out.println("2. Registrar un nuevo préstamo");
             System.out.println("3. Registrar un nuevo usuario");
-        
+            System.out.println("4. Modificar usuario existente");
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
             opcion = scanner.nextInt();
@@ -73,7 +73,35 @@ public class Main {
                     nuevoUsuario.registrarUsuario(archivoUsuarios);
                     break;
 
-                
+                case 4:
+                    // Modificar un usuario existente
+                    System.out.println("\n--- Modificar un Usuario Existente ---");
+                    int carneBuscado = -1;
+                    boolean entradaValida = false;
+
+                    while (!entradaValida) {
+                        try {
+                            System.out.print("Ingrese el carnet del usuario que desea modificar: ");
+                            String input = scanner.nextLine();
+                            carneBuscado = Integer.parseInt(input);
+                            entradaValida = true;  // Si el parse es exitoso, la entrada es válida
+                        } catch (NumberFormatException e) {
+                            System.out.println("Entrada no válida. Por favor ingrese un número entero para el carnet.");
+                        }
+                    }
+
+    System.out.print("Ingrese el nuevo nombre del usuario: ");
+    String nuevoNombre = scanner.nextLine();
+
+    System.out.print("Ingrese el nuevo correo electrónico del usuario: ");
+    String nuevoCorreo = scanner.nextLine();
+
+    System.out.print("Ingrese la nueva contraseña del usuario: ");
+    String nuevaContrasena = scanner.nextLine();
+
+    Usuario.modificarUsuario(archivoUsuarios, carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
+    break;
+
 
                 case 0:
                     System.out.println("Saliendo del sistema...");
