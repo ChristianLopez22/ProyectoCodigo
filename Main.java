@@ -23,6 +23,7 @@ public class Main {
             System.out.println("5. Eliminar un usuario existente");
             System.out.println("6. Solicitar materiales");
             System.out.println("7. Ver solicitudes de materiales");
+            System.out.println("8. Marcar préstamo como regresado");
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
             opcion = scanner.nextInt();
@@ -53,7 +54,7 @@ public class Main {
                     System.out.print("Ingrese el nombre del producto prestado: ");
                     String producto = scanner.nextLine();
 
-                    Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto);
+                    Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto, false);
                     nuevoPrestamo.registrarPrestamo(archivoPrestamos);
                     break;
 
@@ -147,6 +148,19 @@ public class Main {
                     // Ver solicitudes de materiales
                     System.out.println("\n--- Ver Solicitudes ---");
                     SolicitarMateriales.verSolicitudes(archivoSolicitudes); // Llamada al método con el archivo como argumento
+                    break;
+
+                case 8:
+                    System.out.println("\n--- Marcar Préstamo como Regresado ---");
+                    System.out.print("Ingrese el nombre del usuario: ");
+                    String usuarioRegreso = scanner.nextLine();
+                    
+                    System.out.print("Ingrese el nombre del producto: ");
+                    String productoRegreso = scanner.nextLine();
+                    
+                    List<Prestado> prestamosRegreso = Prestado.cargarPrestamosDesdeCSV(archivoPrestamos);
+                    
+                    Prestado.marcarComoRegresado(prestamosRegreso, usuarioRegreso, productoRegreso, archivoPrestamos);
                     break;
 
 

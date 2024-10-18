@@ -12,12 +12,13 @@ public class Prestado {
     private int fecha;
     private String usuario;
     private String producto;
+    private boolean regresado;
 
-    //////Constructor
-    public Prestado(int fecha, String usuario, String producto) {
+    public Prestado(int fecha, String usuario, String producto, boolean regresado) {
         this.fecha = fecha;
         this.usuario = usuario;
         this.producto = producto;
+        this.regresado = regresado; 
     }
 
     //////Getters y setters
@@ -45,6 +46,14 @@ public class Prestado {
         this.producto = producto;
     }
 
+    public boolean isRegresado() { 
+        return regresado;
+    }
+
+    public void setRegresado(boolean regresado) { 
+        this.regresado = regresado;
+    }
+
     //////Método para cargar los préstamos desde un archivo CSV
     public static List<Prestado> cargarPrestamosDesdeCSV(String archivo) {
         List<Prestado> prestamos = new ArrayList<>();
@@ -57,7 +66,8 @@ public class Prestado {
         try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
             String[] linea;
             while ((linea = reader.readNext()) != null) {
-                Prestado prestamo = new Prestado(Integer.parseInt(linea[0]), linea[1], linea[2]);
+                boolean regresado = Boolean.parseBoolean(linea[3]); 
+                Prestado prestamo = new Prestado(Integer.parseInt(linea[0]), linea[1], linea[2], regresado);
                 prestamos.add(prestamo);
             }
         } catch (IOException | CsvValidationException e) {
@@ -73,7 +83,8 @@ public class Prestado {
                 String[] datos = {
                         String.valueOf(prestamo.getFecha()),
                         prestamo.getUsuario(),
-                        prestamo.getProducto()
+                        prestamo.getProducto(),
+                        String.valueOf(prestamo.isRegresado())
                 };
                 writer.writeNext(datos);
             }
@@ -89,12 +100,26 @@ public class Prestado {
             String[] datos = {
                     String.valueOf(this.fecha),
                     this.usuario,
-                    this.producto
+                    this.producto, 
+                    String.valueOf(this.regresado)
             };
             writer.writeNext(datos);
             System.out.println("Préstamo registrado exitosamente.");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    ////Método para marcar regresado
+    public static void marcarComoRegresado(List<Prestado> prestamos, String usuario, String producto, String archivo) {
+        for (Prestado prestamo : prestamos) {
+            if (prestamo.getUsuario().equals(usuario) && prestamo.getProducto().equals(producto)) {
+                prestamo.setRegresado(true); 
+                System.out.println("El préstamo del producto '" + producto + "' por el usuario '" + usuario + "' ha sido marcado como regresado.");
+                break;  
+            }
+        }
+        escribirPrestamosEnCSV(archivo, prestamos);
     }
 }
