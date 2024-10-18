@@ -68,7 +68,6 @@ public class Usuario {
                 this.contrasena
             };
             writer.writeNext(datos);
-            System.out.println("Usuario registrado exitosamente.");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -82,7 +81,6 @@ public class Usuario {
                 usuario.setNombre(nuevoNombre);
                 usuario.setCorreoElectronico(nuevoCorreo);
                 usuario.setContrasena(nuevaContrasena);
-                System.out.println("Usuario modificado exitosamente.");
                 break;
             }
         }
@@ -94,7 +92,6 @@ public class Usuario {
         List<Usuario> usuarios = new ArrayList<>();
         File file = new File(archivo);
         if (!file.exists()) {
-            System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
             return usuarios;
         }
 
@@ -130,13 +127,7 @@ public class Usuario {
     // Método para eliminar un usuario del archivo CSV
     public static void eliminarUsuario(String archivo, int carneBuscado) {
         List<Usuario> usuarios = cargarUsuariosDesdeCSV(archivo);
-        boolean usuarioEncontrado = usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
-
-        if (usuarioEncontrado) {
-            escribirUsuariosEnCSV(archivo, usuarios);
-            System.out.println("Usuario eliminado exitosamente.");
-        } else {
-            System.out.println("Usuario con carnet " + carneBuscado + " no encontrado.");
-        }
+        usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
+        escribirUsuariosEnCSV(archivo, usuarios);
     }
 }

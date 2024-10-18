@@ -76,6 +76,7 @@ public class Main {
 
                     Usuario nuevoUsuario = new Usuario(carne, nombre, correoElectronico, contrasena);
                     nuevoUsuario.registrarUsuario(archivoUsuarios);
+                    System.out.println("Usuario registrado exitosamente.");
                     break;
 
                 case 4:
@@ -105,7 +106,9 @@ public class Main {
                     String nuevaContrasena = scanner.nextLine();
 
                     Usuario.modificarUsuario(archivoUsuarios, carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
+                    System.out.println("Usuario modificado exitosamente.");
                     break;
+
                 case 5:
                     // Eliminar un usuario existente
                     System.out.println("\n--- Eliminar un Usuario ---");
@@ -124,8 +127,8 @@ public class Main {
                     }
 
                     Usuario.eliminarUsuario(archivoUsuarios, carneEliminar);
+                    System.out.println("Usuario eliminado exitosamente.");
                     break;
-
 
                 case 6:
                     // Solicitar materiales
@@ -162,7 +165,6 @@ public class Main {
                     
                     Prestado.marcarComoRegresado(prestamosRegreso, usuarioRegreso, productoRegreso, archivoPrestamos);
                     break;
-
 
                 case 0:
                     System.out.println("Saliendo del sistema...");
