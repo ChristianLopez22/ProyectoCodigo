@@ -1,5 +1,9 @@
-import java.io.*;
-import java.util.*;
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+import com.opencsv.CSVWriter;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 public class SolicitarMateriales {
     private String productodeinteres;
@@ -43,7 +47,7 @@ public class SolicitarMateriales {
         try (CSVWriter writer = new CSVWriter(new FileWriter(archivoSolicitudes, true))) {
             String[] solicitud = {productodeinteres, nombredelinteresado, String.valueOf(contacto)};
             writer.writeNext(solicitud);
-            System.out.println("Solicitud registrada exitosamente.");
+            System.out.println("Solicitud registrada correctamente.");
         } catch (IOException e) {
             System.out.println("Error al registrar la solicitud: " + e.getMessage());
         }

@@ -7,6 +7,7 @@ public class Main {
         String archivoInventario = "inventario.csv";
         String archivoPrestamos = "prestamos.csv";
         String archivoUsuarios = "usuarios.csv";  
+        String archivoSolicitudes = "solicitudes.csv"; 
 
         // Inicializar Scanner
         Scanner scanner = new Scanner(System.in);
@@ -20,6 +21,8 @@ public class Main {
             System.out.println("3. Registrar un nuevo usuario");
             System.out.println("4. Modificar usuario existente");
             System.out.println("5. Eliminar un usuario existente");
+            System.out.println("6. Solicitar materiales");
+            System.out.println("7. Ver solicitudes de materiales");
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
             opcion = scanner.nextInt();
@@ -120,6 +123,30 @@ public class Main {
                     }
 
                     Usuario.eliminarUsuario(archivoUsuarios, carneEliminar);
+                    break;
+
+
+                case 6:
+                    // Solicitar materiales
+                    System.out.println("\n--- Solicitar Materiales ---");
+                    System.out.print("Ingrese el producto de interés: ");
+                    String productoInteres = scanner.nextLine(); // Línea para obtener el producto de interés
+
+                    System.out.print("Ingrese su nombre: ");
+                    String nombreInteresado = scanner.nextLine(); // Línea para obtener el nombre del interesado
+
+                    System.out.print("Ingrese su contacto: ");
+                    int contacto = scanner.nextInt(); // Línea para obtener el contacto
+                    scanner.nextLine(); // Consumir la nueva línea
+
+                    SolicitarMateriales nuevaSolicitud = new SolicitarMateriales(productoInteres, nombreInteresado, contacto); // Llamada al constructor con parámetros
+                    nuevaSolicitud.realizarSolicitud(archivoSolicitudes); // Llamada al método con el archivo como argumento
+                    break;
+
+                case 7:
+                    // Ver solicitudes de materiales
+                    System.out.println("\n--- Ver Solicitudes ---");
+                    SolicitarMateriales.verSolicitudes(archivoSolicitudes); // Llamada al método con el archivo como argumento
                     break;
 
 
