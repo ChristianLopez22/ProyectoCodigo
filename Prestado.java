@@ -1,10 +1,3 @@
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,108 +11,57 @@ public class Prestado {
         this.fecha = fecha;
         this.usuario = usuario;
         this.producto = producto;
-        this.regresado = regresado; 
-    }
-
-    //////Getters y setters
-    public int getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(int fecha) {
-        this.fecha = fecha;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
-    }
-
-    public String getProducto() {
-        return producto;
-    }
-
-    public void setProducto(String producto) {
-        this.producto = producto;
-    }
-
-    public boolean isRegresado() { 
-        return regresado;
-    }
-
-    public void setRegresado(boolean regresado) { 
         this.regresado = regresado;
     }
 
-    //////Método para cargar los préstamos desde un archivo CSV
-    public static List<Prestado> cargarPrestamosDesdeCSV(String archivo) {
-        List<Prestado> prestamos = new ArrayList<>();
-        File file = new File(archivo);
-        if (!file.exists()) {
-            System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
-            return prestamos;
-        }
+    // Getters y setters
+    public int getFecha() { return fecha; }
+    public void setFecha(int fecha) { this.fecha = fecha; }
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
+    public String getProducto() { return producto; }
+    public void setProducto(String producto) { this.producto = producto; }
+    public boolean isRegresado() { return regresado; }
+    public void setRegresado(boolean regresado) { this.regresado = regresado; }
 
-        try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
-            String[] linea;
-            while ((linea = reader.readNext()) != null) {
-                boolean regresado = Boolean.parseBoolean(linea[3]); 
-                Prestado prestamo = new Prestado(Integer.parseInt(linea[0]), linea[1], linea[2], regresado);
-                prestamos.add(prestamo);
-            }
-        } catch (IOException | CsvValidationException e) {
-            e.printStackTrace();
+    // Metodo para cargar prestamos desde la base de datos en memoria
+    public static List<Prestado> cargarPrestamosDesdeBase(BaseDeDatos bd, String archivo) {
+        List<String[]> datos = bd.obtenerDatos(archivo);
+        List<Prestado> prestamos = new ArrayList<>();
+
+        for (String[] linea : datos) {
+            boolean regresado = Boolean.parseBoolean(linea[3]);
+            Prestado prestamo = new Prestado(Integer.parseInt(linea[0]), linea[1], linea[2], regresado);
+            prestamos.add(prestamo);
         }
         return prestamos;
     }
 
-    //////Método para escribir los préstamos en un archivo CSV
-    public static void escribirPrestamosEnCSV(String archivo, List<Prestado> prestamos) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo))) {
-            for (Prestado prestamo : prestamos) {
-                String[] datos = {
-                        String.valueOf(prestamo.getFecha()),
-                        prestamo.getUsuario(),
-                        prestamo.getProducto(),
-                        String.valueOf(prestamo.isRegresado())
-                };
-                writer.writeNext(datos);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /////Método para registrar un nuevo préstamo
-    public void registrarPrestamo(String archivo) {
-
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo, true))) {
-            String[] datos = {
-                    String.valueOf(this.fecha),
-                    this.usuario,
-                    this.producto, 
-                    String.valueOf(this.regresado)
+    // Metodo para guardar préstamos en la base de datos en memoria
+    public static void guardarPrestamosEnBase(BaseDeDatos bd, String archivo, List<Prestado> prestamos) {
+        List<String[]> datos = new ArrayList<>();
+        for (Prestado prestamo : prestamos) {
+            String[] linea = {
+                String.valueOf(prestamo.getFecha()),
+                prestamo.getUsuario(),
+                prestamo.getProducto(),
+                String.valueOf(prestamo.isRegresado())
             };
-            writer.writeNext(datos);
-            System.out.println("Préstamo registrado exitosamente.");
-        } catch (IOException e) {
-            e.printStackTrace();
+            datos.add(linea);
         }
+        bd.actualizarDatos(archivo, datos);
     }
 
-
-    ////Método para marcar regresado
-    public static void marcarComoRegresado(List<Prestado> prestamos, String usuario, String producto, String archivo) {
+    // Metodo para marcar prestamo como regresado
+    public static void marcarComoRegresado(BaseDeDatos bd, String archivo, String usuario, String producto) {
+        List<Prestado> prestamos = cargarPrestamosDesdeBase(bd, archivo);
         for (Prestado prestamo : prestamos) {
             if (prestamo.getUsuario().equals(usuario) && prestamo.getProducto().equals(producto)) {
-                prestamo.setRegresado(true); 
+                prestamo.setRegresado(true);
                 System.out.println("El préstamo del producto '" + producto + "' por el usuario '" + usuario + "' ha sido marcado como regresado.");
-                break;  
+                break;
             }
         }
-        escribirPrestamosEnCSV(archivo, prestamos);
+        guardarPrestamosEnBase(bd, archivo, prestamos);
     }
 }

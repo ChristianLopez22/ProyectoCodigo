@@ -1,71 +1,40 @@
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.IOException;
-import com.opencsv.CSVWriter;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
+import java.util.List;
 
 public class SolicitarMateriales {
-    private String productodeinteres;
-    private String nombredelinteresado;
+    private String productoDeInteres;
+    private String nombreDelInteresado;
     private int contacto;
 
-    // Constructor
     public SolicitarMateriales(String producto, String nombre, int contacto) {
-        this.productodeinteres = producto;
-        this.nombredelinteresado = nombre;
+        this.productoDeInteres = producto;
+        this.nombreDelInteresado = nombre;
         this.contacto = contacto;
     }
 
-    // Métodos getters y setters
-    public String getProductoDeInteres() {
-        return productodeinteres;
+    // Getters y setters
+    public String getProductoDeInteres() { return productoDeInteres; }
+    public void setProductoDeInteres(String producto) { this.productoDeInteres = producto; }
+    public String getNombreDelInteresado() { return nombreDelInteresado; }
+    public void setNombreDelInteresado(String nombre) { this.nombreDelInteresado = nombre; }
+    public int getContacto() { return contacto; }
+    public void setContacto(int contacto) { this.contacto = contacto; }
+
+    // M3todo para realizar una solicitud
+    public void realizarSolicitud(BaseDeDatos bd, String archivoSolicitudes) {
+        String[] solicitud = { productoDeInteres, nombreDelInteresado, String.valueOf(contacto) };
+        bd.agregarLinea(archivoSolicitudes, solicitud);
+        System.out.println("Solicitud registrada correctamente.");
     }
 
-    public void setProductoDeInteres(String producto) {
-        this.productodeinteres = producto;
-    }
-
-    public String getNombreDelInteresado() {
-        return nombredelinteresado;
-    }
-
-    public void setNombreDelInteresado(String nombre) {
-        this.nombredelinteresado = nombre;
-    }
-
-    public int getContacto() {
-        return contacto;
-    }
-
-    public void setContacto(int contacto) {
-        this.contacto = contacto;
-    }
-
-    // Método para realizar una solicitud
-    public void realizarSolicitud(String archivoSolicitudes) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivoSolicitudes, true))) {
-            String[] solicitud = {productodeinteres, nombredelinteresado, String.valueOf(contacto)};
-            writer.writeNext(solicitud);
-            System.out.println("Solicitud registrada correctamente.");
-        } catch (IOException e) {
-            System.out.println("Error al registrar la solicitud: " + e.getMessage());
-        }
-    }
-
-    // Método para ver las solicitudes
-    public static void verSolicitudes(String archivoSolicitudes) {
-        try (CSVReader reader = new CSVReader(new FileReader(archivoSolicitudes))) {
-            String[] siguienteLinea;
-            System.out.println("\n--- Solicitudes de Materiales ---");
-            while ((siguienteLinea = reader.readNext()) != null) {
-                System.out.println("Producto de interés: " + siguienteLinea[0]);
-                System.out.println("Nombre del interesado: " + siguienteLinea[1]);
-                System.out.println("Contacto: " + siguienteLinea[2]);
-                System.out.println("-----------------------------");
-            }
-        } catch (IOException | CsvValidationException e) {
-            System.out.println("Error al leer las solicitudes: " + e.getMessage());
+    // Metodo para ver solicitudes
+    public static void verSolicitudes(BaseDeDatos bd, String archivoSolicitudes) {
+        List<String[]> datos = bd.obtenerDatos(archivoSolicitudes);
+        System.out.println("\n--- Solicitudes de Materiales ---");
+        for (String[] linea : datos) {
+            System.out.println("Producto de interés: " + linea[0]);
+            System.out.println("Nombre del interesado: " + linea[1]);
+            System.out.println("Contacto: " + linea[2]);
+            System.out.println("-----------------------------");
         }
     }
 }

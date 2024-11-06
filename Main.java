@@ -3,11 +3,14 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        // Archivos CSV de prueba
-        String archivoInventario = "inventario.csv";
-        String archivoPrestamos = "prestamos.csv";
-        String archivoUsuarios = "usuarios.csv";  
-        String archivoSolicitudes = "solicitudes.csv"; 
+        // Crear instancia de BaseDeDatos
+        BaseDeDatos bd = new BaseDeDatos();
+
+        // Cargar archivos CSV en memoria
+        bd.cargarCSV("inventario.csv");
+        bd.cargarCSV("usuarios.csv");
+        bd.cargarCSV("prestamos.csv");
+        bd.cargarCSV("solicitudes.csv");
 
         // Inicializar Scanner
         Scanner scanner = new Scanner(System.in);
@@ -33,12 +36,7 @@ public class Main {
                 case 1:
                     // Ver disponibilidad de materiales
                     System.out.println("\n--- Ver Disponibilidad de Materiales ---");
-                    List<Inventarios> inventarios = Inventarios.cargarInventarioDesdeCSV(archivoInventario);
-                    if (inventarios.isEmpty()) {
-                        System.out.println("No hay inventarios cargados.");
-                    } else {
-                        Inventarios.verDisponibilidad(inventarios);
-                    }
+                    Inventarios.verDisponibilidad(bd, "inventario.csv");
                     break;
 
                 case 2:
@@ -46,7 +44,7 @@ public class Main {
                     System.out.println("\n--- Registrar un Nuevo Préstamo ---");
                     System.out.print("Ingrese la fecha del préstamo (formato: YYYYMMDD): ");
                     int fecha = scanner.nextInt();
-                    scanner.nextLine(); // Consumir la nueva línea
+                    scanner.nextLine();
 
                     System.out.print("Ingrese el nombre del usuario: ");
                     String usuario = scanner.nextLine();
@@ -55,7 +53,9 @@ public class Main {
                     String producto = scanner.nextLine();
 
                     Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto, false);
-                    nuevoPrestamo.registrarPrestamo(archivoPrestamos);
+                    List<Prestado> prestamos = Prestado.cargarPrestamosDesdeBase(bd, "prestamos.csv");
+                    prestamos.add(nuevoPrestamo);
+                    Prestado.guardarPrestamosEnBase(bd, "prestamos.csv", prestamos);
                     break;
 
                 case 3:
@@ -63,7 +63,7 @@ public class Main {
                     System.out.println("\n--- Registrar un Nuevo Usuario ---");
                     System.out.print("Ingrese el carnet del usuario: ");
                     int carne = scanner.nextInt();
-                    scanner.nextLine(); // Consumir la nueva línea después de nextInt()
+                    scanner.nextLine();
 
                     System.out.print("Ingrese el nombre del usuario: ");
                     String nombre = scanner.nextLine();
@@ -75,26 +75,18 @@ public class Main {
                     String contrasena = scanner.nextLine();
 
                     Usuario nuevoUsuario = new Usuario(carne, nombre, correoElectronico, contrasena);
-                    nuevoUsuario.registrarUsuario(archivoUsuarios);
+                    List<Usuario> usuarios = Usuario.cargarUsuariosDesdeBase(bd, "usuarios.csv");
+                    usuarios.add(nuevoUsuario);
+                    Usuario.guardarUsuariosEnBase(bd, "usuarios.csv", usuarios);
                     System.out.println("Usuario registrado exitosamente.");
                     break;
 
                 case 4:
                     // Modificar un usuario existente
                     System.out.println("\n--- Modificar un Usuario Existente ---");
-                    int carneBuscado = -1;
-                    boolean entradaValida = false;
-
-                    while (!entradaValida) {
-                        try {
-                            System.out.print("Ingrese el carnet del usuario que desea modificar: ");
-                            String input = scanner.nextLine();
-                            carneBuscado = Integer.parseInt(input);
-                            entradaValida = true;  // Si el parse es exitoso, la entrada es válida
-                        } catch (NumberFormatException e) {
-                            System.out.println("Entrada no válida. Por favor ingrese un número entero para el carnet.");
-                        }
-                    }
+                    System.out.print("Ingrese el carnet del usuario que desea modificar: ");
+                    int carneBuscado = scanner.nextInt();
+                    scanner.nextLine();
 
                     System.out.print("Ingrese el nuevo nombre del usuario: ");
                     String nuevoNombre = scanner.nextLine();
@@ -105,28 +97,18 @@ public class Main {
                     System.out.print("Ingrese la nueva contraseña del usuario: ");
                     String nuevaContrasena = scanner.nextLine();
 
-                    Usuario.modificarUsuario(archivoUsuarios, carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
+                    Usuario.modificarUsuario(bd, "usuarios.csv", carneBuscado, nuevoNombre, nuevoCorreo, nuevaContrasena);
                     System.out.println("Usuario modificado exitosamente.");
                     break;
 
                 case 5:
                     // Eliminar un usuario existente
                     System.out.println("\n--- Eliminar un Usuario ---");
-                    int carneEliminar = -1;
-                    boolean entradaEliminarValida = false;
+                    System.out.print("Ingrese el carnet del usuario que desea eliminar: ");
+                    int carneEliminar = scanner.nextInt();
+                    scanner.nextLine();
 
-                    while (!entradaEliminarValida) {
-                        try {
-                            System.out.print("Ingrese el carnet del usuario que desea eliminar: ");
-                            String input = scanner.nextLine();
-                            carneEliminar = Integer.parseInt(input);
-                            entradaEliminarValida = true;  // Si el parse es exitoso, la entrada es válida
-                        } catch (NumberFormatException e) {
-                            System.out.println("Entrada no válida. Por favor ingrese un número entero para el carnet.");
-                        }
-                    }
-
-                    Usuario.eliminarUsuario(archivoUsuarios, carneEliminar);
+                    Usuario.eliminarUsuario(bd, "usuarios.csv", carneEliminar);
                     System.out.println("Usuario eliminado exitosamente.");
                     break;
 
@@ -134,36 +116,34 @@ public class Main {
                     // Solicitar materiales
                     System.out.println("\n--- Solicitar Materiales ---");
                     System.out.print("Ingrese el producto de interés: ");
-                    String productoInteres = scanner.nextLine(); // Línea para obtener el producto de interés
+                    String productoInteres = scanner.nextLine();
 
                     System.out.print("Ingrese su nombre: ");
-                    String nombreInteresado = scanner.nextLine(); // Línea para obtener el nombre del interesado
+                    String nombreInteresado = scanner.nextLine();
 
                     System.out.print("Ingrese su contacto: ");
-                    int contacto = scanner.nextInt(); // Línea para obtener el contacto
-                    scanner.nextLine(); // Consumir la nueva línea
+                    int contacto = scanner.nextInt();
+                    scanner.nextLine();
 
-                    SolicitarMateriales nuevaSolicitud = new SolicitarMateriales(productoInteres, nombreInteresado, contacto); // Llamada al constructor con parámetros
-                    nuevaSolicitud.realizarSolicitud(archivoSolicitudes); // Llamada al método con el archivo como argumento
+                    SolicitarMateriales nuevaSolicitud = new SolicitarMateriales(productoInteres, nombreInteresado, contacto);
+                    nuevaSolicitud.realizarSolicitud(bd, "solicitudes.csv");
                     break;
 
                 case 7:
                     // Ver solicitudes de materiales
                     System.out.println("\n--- Ver Solicitudes ---");
-                    SolicitarMateriales.verSolicitudes(archivoSolicitudes); // Llamada al método con el archivo como argumento
+                    SolicitarMateriales.verSolicitudes(bd, "solicitudes.csv");
                     break;
 
                 case 8:
                     System.out.println("\n--- Marcar Préstamo como Regresado ---");
                     System.out.print("Ingrese el nombre del usuario: ");
                     String usuarioRegreso = scanner.nextLine();
-                    
+
                     System.out.print("Ingrese el nombre del producto: ");
                     String productoRegreso = scanner.nextLine();
-                    
-                    List<Prestado> prestamosRegreso = Prestado.cargarPrestamosDesdeCSV(archivoPrestamos);
-                    
-                    Prestado.marcarComoRegresado(prestamosRegreso, usuarioRegreso, productoRegreso, archivoPrestamos);
+
+                    Prestado.marcarComoRegresado(bd, "prestamos.csv", usuarioRegreso, productoRegreso);
                     break;
 
                 case 0:
@@ -176,7 +156,14 @@ public class Main {
             }
         }
 
+        // Guardar cambios en archivos
+        bd.guardarCSV("inventario.csv");
+        bd.guardarCSV("usuarios.csv");
+        bd.guardarCSV("prestamos.csv");
+        bd.guardarCSV("solicitudes.csv");
+
         // Cerrar el Scanner
         scanner.close();
     }
 }
+
