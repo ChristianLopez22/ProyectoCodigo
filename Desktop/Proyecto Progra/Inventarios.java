@@ -21,15 +21,15 @@ public class Inventarios {
     public String getMaterial() { return material; }
     public void setMaterial(String material) { this.material = material; }
 
-    // Método para verificar disponibilidad de un material por su ID
-    public boolean isDisponible() {
-        return cantidad > 0;
+    // Método para verificar si un material está disponible en el inventario
+    public boolean isDisponible(int cantidadSolicitada) {
+        return this.cantidad >= cantidadSolicitada;
     }
 
-    // Método para reducir la cantidad disponible en caso de préstamo
+    // Método para reducir la cantidad en el inventario después de un préstamo
     public void reducirCantidad(int cantidadPrestada) {
-        if (cantidad >= cantidadPrestada) {
-            cantidad -= cantidadPrestada;
+        if (this.cantidad >= cantidadPrestada) {
+            this.cantidad -= cantidadPrestada;
         } else {
             System.out.println("No hay suficiente cantidad de " + material);
         }
@@ -65,11 +65,21 @@ public class Inventarios {
         bd.actualizarDatos(archivo, datos);
     }
 
-    // Método para verificar la disponibilidad de todos los materiales
+    // Método para buscar un inventario por nombre de material
+    public static Inventarios buscarInventarioPorNombre(List<Inventarios> inventarios, String nombreMaterial) {
+        for (Inventarios inventario : inventarios) {
+            if (inventario.getMaterial().equalsIgnoreCase(nombreMaterial)) {
+                return inventario;
+            }
+        }
+        return null;
+    }
+
+    // Método para ver la disponibilidad de materiales
     public static void verDisponibilidad(BaseDeDatos bd, String archivo) {
         List<Inventarios> inventarios = cargarInventarioDesdeBase(bd, archivo);
         for (Inventarios inventario : inventarios) {
-            if (inventario.isDisponible()) {
+            if (inventario.getCantidad() > 0) {
                 System.out.println("ID: " + inventario.getId() + " - Material: " + inventario.getMaterial() +
                         " disponible con cantidad: " + inventario.getCantidad());
             } else {

@@ -40,7 +40,7 @@ public class Main {
                     break;
 
                 case 2:
-                    // Registrar un nuevo préstamo
+                    // Registrar un nuevo préstamo con verificación de disponibilidad
                     System.out.println("\n--- Registrar un Nuevo Préstamo ---");
                     System.out.print("Ingrese la fecha del préstamo (formato: YYYYMMDD): ");
                     int fecha = scanner.nextInt();
@@ -52,14 +52,28 @@ public class Main {
                     System.out.print("Ingrese el nombre del producto prestado: ");
                     String producto = scanner.nextLine();
 
-                    System.out.print("Ingrese la cantidad de días de préstamo: "); // Nuevo campo para los días de préstamo
+                    System.out.print("Ingrese la cantidad de días de préstamo: ");
                     int diasPrestamo = scanner.nextInt();
                     scanner.nextLine();
 
-                    Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto, false, diasPrestamo); // Se añade diasPrestamo
-                    List<Prestado> prestamos = Prestado.cargarPrestamosDesdeBase(bd, "prestamos.csv");
-                    prestamos.add(nuevoPrestamo);
-                    Prestado.guardarPrestamosEnBase(bd, "prestamos.csv", prestamos);
+                    // Cargar inventario y verificar disponibilidad
+                    List<Inventarios> inventarios = Inventarios.cargarInventarioDesdeBase(bd, "inventario.csv");
+                    Inventarios inventario = Inventarios.buscarInventarioPorNombre(inventarios, producto);
+
+                    if (inventario != null && inventario.isDisponible(1)) { // Verificar disponibilidad
+                        inventario.reducirCantidad(1); // Reducir cantidad en inventario
+                        Inventarios.guardarInventarioEnBase(bd, "inventario.csv", inventarios);
+
+                        // Registrar el préstamo
+                        Prestado nuevoPrestamo = new Prestado(fecha, usuario, producto, false, diasPrestamo);
+                        List<Prestado> prestamos = Prestado.cargarPrestamosDesdeBase(bd, "prestamos.csv");
+                        prestamos.add(nuevoPrestamo);
+                        Prestado.guardarPrestamosEnBase(bd, "prestamos.csv", prestamos);
+
+                        System.out.println("Préstamo registrado exitosamente.");
+                    } else {
+                        System.out.println("El producto '" + producto + "' no está disponible en el inventario.");
+                    }
                     break;
 
                 case 3:
@@ -140,6 +154,7 @@ public class Main {
                     break;
 
                 case 8:
+                    // Marcar préstamo como regresado
                     System.out.println("\n--- Marcar Préstamo como Regresado ---");
                     System.out.print("Ingrese el nombre del usuario: ");
                     String usuarioRegreso = scanner.nextLine();
