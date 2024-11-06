@@ -6,14 +6,14 @@ public class Prestado {
     private String usuario;
     private String producto;
     private boolean regresado;
-    private int diasPrestamo;
+    private int diasPrestamo; // Nuevo atributo para almacenar la cantidad de días de préstamo
 
     public Prestado(int fecha, String usuario, String producto, boolean regresado, int diasPrestamo) {
         this.fecha = fecha;
         this.usuario = usuario;
         this.producto = producto;
         this.regresado = regresado;
-        this.diasPrestamo = diasPrestamo;
+        this.diasPrestamo = diasPrestamo; // Asignación del nuevo atributo
     }
 
     // Getters y setters
@@ -28,37 +28,25 @@ public class Prestado {
     public int getDiasPrestamo() { return diasPrestamo; }
     public void setDiasPrestamo(int diasPrestamo) { this.diasPrestamo = diasPrestamo; }
 
-    // Método para cargar préstamos desde la base de datos en memoria con manejo de errores
+    // Método para cargar préstamos desde la base de datos en memoria
     public static List<Prestado> cargarPrestamosDesdeBase(BaseDeDatos bd, String archivo) {
         List<String[]> datos = bd.obtenerDatos(archivo);
         List<Prestado> prestamos = new ArrayList<>();
 
         for (String[] linea : datos) {
-            try {
-                if (linea.length < 5) {
-                    System.out.println("Advertencia: Línea incompleta en el archivo '" + archivo + "'. Saltando esta línea.");
-                    continue; // Saltar líneas incompletas
-                }
-                
-                int fecha = Integer.parseInt(linea[0].trim());
-                String usuario = linea[1].trim();
-                String producto = linea[2].trim();
-                boolean regresado = Boolean.parseBoolean(linea[3].trim());
-                int diasPrestamo = Integer.parseInt(linea[4].trim());
-                
-                Prestado prestamo = new Prestado(fecha, usuario, producto, regresado, diasPrestamo);
-                prestamos.add(prestamo);
-                
-            } catch (NumberFormatException e) {
-                System.out.println("Error de formato en una línea de '" + archivo + "'. Saltando esta línea.");
-            } catch (Exception e) {
-                System.out.println("Error inesperado al procesar el archivo '" + archivo + "': " + e.getMessage());
-            }
+            int fecha = Integer.parseInt(linea[0].trim());
+            String usuario = linea[1].trim();
+            String producto = linea[2].trim();
+            boolean regresado = Boolean.parseBoolean(linea[3].trim());
+            int diasPrestamo = Integer.parseInt(linea[4].trim());
+
+            Prestado prestamo = new Prestado(fecha, usuario, producto, regresado, diasPrestamo);
+            prestamos.add(prestamo);
         }
         return prestamos;
     }
 
-    // Método para guardar préstamos en la base de datos en memoria de forma automática y con formato correcto
+    // Método para guardar préstamos en la base de datos en memoria
     public static void guardarPrestamosEnBase(BaseDeDatos bd, String archivo, List<Prestado> prestamos) {
         List<String[]> datos = new ArrayList<>();
         for (Prestado prestamo : prestamos) {
@@ -74,17 +62,11 @@ public class Prestado {
         bd.actualizarDatos(archivo, datos);
     }
 
-    // Método para calcular días de retraso (ejemplo básico)
-    public int calcularDiasRetraso(int fechaActual) {
-        int diasTranscurridos = fechaActual - fecha; // Asumiendo que la fecha está en días enteros consecutivos
-        return Math.max(0, diasTranscurridos - diasPrestamo); // Retorna el retraso en días
-    }
-
-    // Método para marcar un préstamo como regresado
+    // Método para marcar préstamo como regresado
     public static void marcarComoRegresado(BaseDeDatos bd, String archivo, String usuario, String producto) {
         List<Prestado> prestamos = cargarPrestamosDesdeBase(bd, archivo);
         for (Prestado prestamo : prestamos) {
-            if (prestamo.getUsuario().equals(usuario) && prestamo.getProducto().equals(producto) && !prestamo.isRegresado()) {
+            if (prestamo.getUsuario().equals(usuario) && prestamo.getProducto().equals(producto)) {
                 prestamo.setRegresado(true);
                 System.out.println("El préstamo del producto '" + producto + "' por el usuario '" + usuario + "' ha sido marcado como regresado.");
                 break;
