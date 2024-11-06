@@ -1,10 +1,3 @@
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,10 +7,6 @@ public class Usuario {
     private String correoElectronico;
     private String contrasena;
 
-    public Usuario() {
-    }
-
-    // Constructor con argumentos
     public Usuario(int carne, String nombre, String correoElectronico, String contrasena) {
         this.carne = carne;
         this.nombre = nombre;
@@ -26,117 +15,57 @@ public class Usuario {
     }
 
     // Getters y setters
-    public int getCarne() {
-        return carne;
-    }
+    public int getCarne() { return carne; }
+    public void setCarne(int carne) { this.carne = carne; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getCorreoElectronico() { return correoElectronico; }
+    public void setCorreoElectronico(String correoElectronico) { this.correoElectronico = correoElectronico; }
+    public String getContrasena() { return contrasena; }
+    public void setContrasena(String contrasena) { this.contrasena = contrasena; }
 
-    public void setCarne(int carne) {
-        this.carne = carne;
-    }
+    // Metodos de manipulación de usuarios
+    public static List<Usuario> cargarUsuariosDesdeBase(BaseDeDatos bd, String archivo) {
+        List<String[]> datos = bd.obtenerDatos(archivo);
+        List<Usuario> usuarios = new ArrayList<>();
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getCorreoElectronico() {
-        return correoElectronico;
-    }
-
-    public void setCorreoElectronico(String correoElectronico) {
-        this.correoElectronico = correoElectronico;
-    }
-
-    public String getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
-    }
-
-    // Método para registrar un nuevo usuario en el CSV
-    public void registrarUsuario(String archivo) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo, true))) {
-            String[] datos = {
-                String.valueOf(this.carne),
-                this.nombre,
-                this.correoElectronico,
-                this.contrasena
-            };
-            writer.writeNext(datos);
-            System.out.println("Usuario registrado exitosamente.");
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (String[] linea : datos) {
+            Usuario usuario = new Usuario(Integer.parseInt(linea[0]), linea[1], linea[2], linea[3]);
+            usuarios.add(usuario);
         }
+        return usuarios;
     }
 
-    // Método para modificar un usuario existente en el CSV
-    public static void modificarUsuario(String archivo, int carneBuscado, String nuevoNombre, String nuevoCorreo, String nuevaContrasena) {
-        List<Usuario> usuarios = cargarUsuariosDesdeCSV(archivo);
+    public static void guardarUsuariosEnBase(BaseDeDatos bd, String archivo, List<Usuario> usuarios) {
+        List<String[]> datos = new ArrayList<>();
+        for (Usuario usuario : usuarios) {
+            String[] linea = {
+                String.valueOf(usuario.getCarne()),
+                usuario.getNombre(),
+                usuario.getCorreoElectronico(),
+                usuario.getContrasena()
+            };
+            datos.add(linea);
+        }
+        bd.actualizarDatos(archivo, datos);
+    }
+
+    public static void modificarUsuario(BaseDeDatos bd, String archivo, int carneBuscado, String nuevoNombre, String nuevoCorreo, String nuevaContrasena) {
+        List<Usuario> usuarios = cargarUsuariosDesdeBase(bd, archivo);
         for (Usuario usuario : usuarios) {
             if (usuario.getCarne() == carneBuscado) {
                 usuario.setNombre(nuevoNombre);
                 usuario.setCorreoElectronico(nuevoCorreo);
                 usuario.setContrasena(nuevaContrasena);
-                System.out.println("Usuario modificado exitosamente.");
                 break;
             }
         }
-        escribirUsuariosEnCSV(archivo, usuarios);
+        guardarUsuariosEnBase(bd, archivo, usuarios);
     }
 
-    // Método para cargar usuarios desde un archivo CSV
-    public static List<Usuario> cargarUsuariosDesdeCSV(String archivo) {
-        List<Usuario> usuarios = new ArrayList<>();
-        File file = new File(archivo);
-        if (!file.exists()) {
-            System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
-            return usuarios;
-        }
-
-        try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
-            String[] linea;
-            while ((linea = reader.readNext()) != null) {
-                Usuario usuario = new Usuario(Integer.parseInt(linea[0]), linea[1], linea[2], linea[3]);
-                usuarios.add(usuario);
-            }
-        } catch (IOException | CsvValidationException e) {
-            e.printStackTrace();
-        }
-        return usuarios;
-    }
-
-    // Método para escribir usuarios en un archivo CSV
-    public static void escribirUsuariosEnCSV(String archivo, List<Usuario> usuarios) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo))) {
-            for (Usuario usuario : usuarios) {
-                String[] datos = {
-                    String.valueOf(usuario.getCarne()),
-                    usuario.getNombre(),
-                    usuario.getCorreoElectronico(),
-                    usuario.getContrasena()
-                };
-                writer.writeNext(datos);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Método para eliminar un usuario del archivo CSV
-    public static void eliminarUsuario(String archivo, int carneBuscado) {
-        List<Usuario> usuarios = cargarUsuariosDesdeCSV(archivo);
-        boolean usuarioEncontrado = usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
-
-        if (usuarioEncontrado) {
-            escribirUsuariosEnCSV(archivo, usuarios);
-            System.out.println("Usuario eliminado exitosamente.");
-        } else {
-            System.out.println("Usuario con carnet " + carneBuscado + " no encontrado.");
-        }
+    public static void eliminarUsuario(BaseDeDatos bd, String archivo, int carneBuscado) {
+        List<Usuario> usuarios = cargarUsuariosDesdeBase(bd, archivo);
+        usuarios.removeIf(usuario -> usuario.getCarne() == carneBuscado);
+        guardarUsuariosEnBase(bd, archivo, usuarios);
     }
 }

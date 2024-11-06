@@ -1,85 +1,72 @@
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
-import com.opencsv.exceptions.CsvValidationException;  
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Inventarios {
     private int cantidad;
     private String material;
+    private int id;
 
     // Constructor
-    public Inventarios(int cantidad, String material) {
-        this.cantidad = cantidad;
-        this.material = material;
-    }
+   public Inventarios(int id, int cantidad, String material) {
+    this.id = id;
+    this.cantidad = cantidad;
+    this.material = material;
+}
+
 
     // Getters y setters
-    public int getCantidad() {
-        return cantidad;
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+    public int getCantidad() { return cantidad; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    public String getMaterial() { return material; }
+    public void setMaterial(String material) { this.material = material; }
+
+    // Metodo para cargar inventarios desde la base de datos en memoria
+public static List<Inventarios> cargarInventarioDesdeBase(BaseDeDatos bd, String archivo) {
+    List<String[]> datos = bd.obtenerDatos(archivo);
+    List<Inventarios> inventarios = new ArrayList<>();
+
+    for (String[] linea : datos) {
+        int id = Integer.parseInt(linea[0].trim());
+        int cantidad = Integer.parseInt(linea[1].trim());
+        String material = linea[2].trim();
+
+        Inventarios inventario = new Inventarios(id, cantidad, material);
+        inventarios.add(inventario);
     }
+    return inventarios;
+}
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
+
+
+    // Metodo para guardar inventarios en la base de datos en memoria
+  public static void guardarInventarioEnBase(BaseDeDatos bd, String archivo, List<Inventarios> inventarios) {
+    List<String[]> datos = new ArrayList<>();
+    for (Inventarios inventario : inventarios) {
+        String[] linea = {
+            String.valueOf(inventario.getId()),
+            String.valueOf(inventario.getCantidad()),
+            inventario.getMaterial()
+        };
+        datos.add(linea);
     }
+    bd.actualizarDatos(archivo, datos);
+}
 
-    public String getMaterial() {
-        return material;
-    }
 
-    public void setMaterial(String material) {
-        this.material = material;
-    }
-
-    // Método para cargar inventarios desde un archivo CSV
-    public static List<Inventarios> cargarInventarioDesdeCSV(String archivo) {
-        List<Inventarios> inventarios = new ArrayList<>();
-        File file = new File(archivo);
-        if (!file.exists()) {
-            System.out.println("El archivo " + archivo + " no existe. Por favor, cree el archivo primero.");
-            return inventarios; 
-        }
-
-        try (CSVReader reader = new CSVReader(new FileReader(archivo))) {
-            String[] linea;
-            while ((linea = reader.readNext()) != null) {
-                Inventarios inventario = new Inventarios(Integer.parseInt(linea[0]), linea[1]);
-                inventarios.add(inventario);
-            }
-        } catch (IOException | CsvValidationException e) {  
-            e.printStackTrace(); 
-        }
-        return inventarios;
-    }
-
-    // Método para escribir el inventario en un archivo CSV
-    public static void escribirInventarioEnCSV(String archivo, List<Inventarios> inventarios) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(archivo))) {
-            for (Inventarios inventario : inventarios) {
-                String[] datos = {
-                        String.valueOf(inventario.getCantidad()),
-                        inventario.getMaterial()
-                };
-                writer.writeNext(datos);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // Método para verificar la disponibilidad de materiales
-    public static void verDisponibilidad(List<Inventarios> inventarios) {
-        System.out.println("Verificando disponibilidad de materiales...");
-        for (Inventarios inventario : inventarios) {
-            if (inventario.getCantidad() > 0) {
-                System.out.println("Material: " + inventario.getMaterial() + " está disponible con cantidad: " + inventario.getCantidad());
-            } else {
-                System.out.println("Material: " + inventario.getMaterial() + " está agotado.");
-            }
+    // Metodo para verificar disponibilidad
+public static void verDisponibilidad(BaseDeDatos bd, String archivo) {
+    List<Inventarios> inventarios = cargarInventarioDesdeBase(bd, archivo);
+    for (Inventarios inventario : inventarios) {
+        if (inventario.getCantidad() > 0) {
+            System.out.println("ID: " + inventario.getId() + " - Material: " + inventario.getMaterial() +
+                    " disponible con cantidad: " + inventario.getCantidad());
+        } else {
+            System.out.println("ID: " + inventario.getId() + " - Material: " + inventario.getMaterial() + " está agotado.");
         }
     }
+}
+
+
 }
